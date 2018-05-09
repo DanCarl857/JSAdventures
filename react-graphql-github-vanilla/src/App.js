@@ -1,21 +1,61 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
-import './App.css';
+import axios from 'axios';
+
+const axiosGithubGraphQL = axios.create({
+    baseURL: 'https://api.github.com/graphql',
+    headers: {
+        Authorization: `bearer ${process.env.REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN}`
+    }
+});
+
+const TITLE = 'React GraphQL Github Client';
 
 class App extends Component {
-  render() {
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <h1 className="App-title">Welcome to React</h1>
-        </header>
-        <p className="App-intro">
-          To get started, edit <code>src/App.js</code> and save to reload.
-        </p>
-      </div>
-    );
-  }
+    state = {
+        path: 'the-road-to-learn-react/the-road-to-learn-react',
+    };
+
+    componentDidMount() {
+
+    }
+
+    onChange = event => {
+        this.setState({ path: event.target.value });
+    }
+
+    onSubmit = event => {
+        // fetch data
+
+        event.preventDefault();
+    }
+
+    render() {
+        const { path } = this.state; 
+
+        return(
+            <div>
+                <h1>{TITLE}</h1>
+
+                <form onSubmit={this.onSubmit}>
+                    <label htmlFor="url">
+                        Show open issues for https://github.com/
+                    </label>
+                    <input 
+                        id="url"
+                        type="text"
+                        value={path}
+                        onChange={this.onChange}
+                        style={{ width: '300px' }}
+                    />
+                    <button type="submit">Search</button>
+                </form>
+
+                <hr />
+
+                {/* Here comes the results */}
+            </div>
+        )
+    }
 }
 
 export default App;
