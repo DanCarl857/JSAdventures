@@ -10,13 +10,25 @@ const axiosGithubGraphQL = axios.create({
 
 const TITLE = 'React GraphQL Github Client';
 
+// gql query to get organization
+const GET_ORGANIZATION = `
+    {
+        organization(login: "the-road-to-learn-react") {
+            name
+            url
+        }
+    }
+`;
+
 class App extends Component {
     state = {
         path: 'the-road-to-learn-react/the-road-to-learn-react',
+        organization: null,
+        errors: null,
     };
 
     componentDidMount() {
-
+        this.onFetchFromGithub();
     }
 
     onChange = event => {
@@ -29,8 +41,19 @@ class App extends Component {
         event.preventDefault();
     }
 
+    onFetchFromGithub = () => {
+        axiosGithubGraphQL
+            .post('', { query: GET_ORGANIZATION })
+            .then(result =>
+                this.setState(() => ({
+                  organization: result.data.data.organization,
+                  errors: result.data.errors,
+                })),
+            );
+    }
+
     render() {
-        const { path } = this.state; 
+        const { path, organization, errors } = this.state; 
 
         return(
             <div>
@@ -53,9 +76,36 @@ class App extends Component {
                 <hr />
 
                 {/* Here comes the results */}
+                {
+                    organization ? (
+                        <Organization organization={organization} errors={errors} />
+                    ) : (
+                        <p>No information yet ...</p>
+                    )
+                }
             </div>
         )
     }
 }
+
+const Organization = ({ organization, errors }) => {
+    if (errors) {
+      return (
+        <p>
+          <strong>Something went wrong:</strong>
+          {errors.map(error => error.message).join(' ')}
+        </p>
+      );
+    }
+  
+    return (
+      <div>
+        <p>
+          <strong>Issues from Organization:</strong>
+          <a href={organization.url}>{organization.name}</a>
+        </p>
+      </div>
+    );
+};
 
 export default App;
